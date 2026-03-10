@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaStudio — AI & Tech Product Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090E;--surface:#0F0F17;--surface2:#161622;
+  --white:#F0EEF8;--muted:#6B697E;--line:#1E1E2C;
+  --acid:#B8FF00;--blue:#4F7FFF;--orange:#FF6B2B;--pink:#FF3D8A;--teal:#00D4B4;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:'Instrument Sans',sans-serif;overflow-x:hidden;cursor:none}
+
+/* CUSTOM CURSOR */
+.cursor{position:fixed;width:10px;height:10px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.1s,width 0.2s,height 0.2s}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(184,255,0,0.3);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform 0.15s,width 0.3s,height 0.3s,border-color 0.3s}
+body:has(a:hover) .cursor,.cursor.hover{width:20px;height:20px;background:var(--acid)}
+body:has(button:hover) .cursor{width:16px;height:16px}
+
+/* NOISE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9998}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:20px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid transparent;transition:all 0.3s;backdrop-filter:blur(0)}
+nav.scrolled{background:rgba(9,9,14,0.9);border-bottom-color:var(--line);backdrop-filter:blur(20px)}
+.nav-logo{font-family:'Fraunces',serif;font-size:22px;font-weight:900;letter-spacing:-0.5px}
+.nav-logo span{color:var(--acid)}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{padding:10px 22px;background:var(--acid);color:#000;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;border:none;cursor:none;font-family:'Instrument Sans',sans-serif;transition:all 0.2s}
+.nav-cta:hover{background:var(--white)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 48px 80px;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;opacity:0.4}
+.hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(184,255,0,0.06) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none}
+.hero-glow2{position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(79,127,255,0.08) 0%,transparent 70%);bottom:0;left:200px;pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--acid);margin-bottom:28px}
+.hero-tag::before{content:'';width:30px;height:1px;background:var(--acid)}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(56px,8vw,120px);font-weight:900;line-height:0.95;letter-spacing:-2px;margin-bottom:32px}
+.hero h1 .line2{color:var(--muted);font-style:italic;font-weight:300}
+.hero-desc{font-size:16px;color:var(--muted);max-width:480px;line-height:1.8;margin-bottom:48px}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap}
+.btn-primary{padding:16px 32px;background:var(--acid);color:#000;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;border:none;cursor:none;font-family:'Instrument Sans',sans-serif;transition:all 0.2s}
+.btn-primary:hover{background:var(--white);transform:translateY(-2px)}
+.btn-ghost{padding:16px 32px;background:transparent;color:var(--white);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:500;border:1px solid var(--line);cursor:none;font-family:'Instrument Sans',sans-serif;transition:all 0.2s}
+.btn-ghost:hover{border-color:var(--white);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:48px;margin-top:80px;padding-top:48px;border-top:1px solid var(--line)}
+.h-stat-num{font-family:'Fraunces',serif;font-size:48px;font-weight:900;color:var(--acid);line-height:1}
+.h-stat-label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+
+/* MARQUEE */
+.marquee-section{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;overflow:hidden;background:var(--surface)}
+.marquee-track{display:flex;gap:48px;animation:marquee 20s linear infinite;white-space:nowrap}
+.marquee-item{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:16px}
+.marquee-item::after{content:'✦';color:var(--acid)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTION COMMONS */
+section{padding:100px 48px}
+.section-tag{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--acid);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-tag::before{content:'';width:20px;height:1px;background:var(--acid)}
+.section-title{font-family:'Fraunces',serif;font-size:clamp(36px,5vw,64px);font-weight:900;line-height:1.05;letter-spacing:-1px;margin-bottom:16px}
+.section-sub{font-size:15px;color:var(--muted);max-width:520px;line-height:1.8}
+
+/* PROJECTS GRID */
+#projects{background:var(--bg)}
+.projects-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;flex-wrap:wrap;gap:24px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.f-btn{padding:8px 18px;background:transparent;border:1px solid var(--line);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Instrument Sans',sans-serif;cursor:none;transition:all 0.15s}
+.f-btn:hover,.f-btn.active{background:var(--acid);border-color:var(--acid);color:#000;font-weight:600}
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.proj-card{background:var(--bg);padding:32px;cursor:none;transition:background 0.2s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:20px}
+.proj-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(184,255,0,0.03));opacity:0;transition:opacity 0.3s}
+.proj-card:hover{background:var(--surface)}
+.proj-card:hover::before{opacity:1}
+.proj-num{font-family:'Fraunces',serif;font-size:11px;color:var(--muted);letter-spacing:2px}
+.proj-domain{display:inline-block;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:2px;font-weight:600;margin-bottom:4px}
+.proj-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;line-height:1.2}
+.proj-desc{font-size:12px;color:var(--muted);line-height:1.8}
+.proj-footer{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:20px;border-top:1px solid var(--line)}
+.proj-price{font-family:'Fraunces',serif;font-size:20px;font-weight:700}
+.proj-demo-btn{font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border:none;font-family:'Instrument Sans',sans-serif;cursor:none;font-weight:600;transition:all 0.15s}
+.proj-demo-btn:hover{transform:translateX(3px)}
+.demand-row{display:flex;align-items:center;gap:10px}
+.d-track{flex:1;height:2px;background:var(--line)}
+.d-fill{height:100%;transition:width 1s ease}
+.d-pct{font-size:11px;font-weight:600;min-width:32px;text-align:right}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(9,9,14,0.92);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;backdrop-filter:blur(8px)}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--surface);width:100%;max-width:1000px;max-height:90vh;overflow-y:auto;border:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;transform:translateY(20px);transition:transform 0.25s}
+.modal-bg.open .modal-box{transform:translateY(0)}
+.modal-left{padding:40px;border-right:1px solid var(--line);overflow-y:auto}
+.modal-right{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.modal-close-btn{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:28px;cursor:none;font-family:'Instrument Sans',sans-serif;line-height:1;transition:color 0.15s;z-index:10}
+.modal-close-btn:hover{color:var(--white)}
+.modal-left{position:relative}
+.modal-domain{font-size:9px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;border-radius:2px;font-weight:600;display:inline-block;margin-bottom:16px}
+.modal-title{font-family:'Fraunces',serif;font-size:28px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.modal-tagline{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.info-block{margin-bottom:20px}
+.info-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.feature-li{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.7;color:var(--white);margin-bottom:8px}
+.f-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.target-chips{display:flex;flex-wrap:wrap;gap:6px}
+.t-chip{font-size:10px;padding:5px 12px;border:1px solid var(--line);color:var(--muted);border-radius:2px}
+.pitch-q{background:var(--bg);border-left:2px solid var(--acid);padding:14px 16px;font-size:12px;font-style:italic;color:var(--white);line-height:1.8}
+.price-row{display:flex;gap:8px}
+.price-t{flex:1;border:1px solid var(--line);padding:12px 10px;text-align:center}
+.price-t.hot{border-color:var(--acid);background:rgba(184,255,0,0.05)}
+.pt-name{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.pt-price{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--white)}
+.pt-desc{font-size:9px;color:var(--muted);margin-top:4px}
+
+/* DEMO AREA */
+.demo-area{flex:1;background:var(--bg);overflow-y:auto;display:flex;flex-direction:column}
+.demo-header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:var(--surface2)}
+.demo-dots{display:flex;gap:6px}
+.demo-dot{width:10px;height:10px;border-radius:50%}
+.demo-title-bar{flex:1;text-align:center;font-size:11px;color:var(--muted);letter-spacing:1px}
+.demo-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;border-radius:2px;font-weight:600}
+.demo-content{flex:1;padding:20px;overflow-y:auto}
+
+/* SPECIFIC DEMO STYLES */
+/* WhatsApp Demo */
+.wa-phone{max-width:320px;margin:0 auto;background:#0d1117;border-radius:20px;overflow:hidden;border:1px solid #1a1a2e;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.wa-head{background:#128C7E;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.wa-avatar{width:36px;height:36px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.wa-name{font-size:13px;font-weight:600;color:#fff}
+.wa-status{font-size:10px;color:rgba(255,255,255,0.7)}
+.wa-msgs{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:220px}
+.wa-msg{max-width:78%;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.6}
+.wa-msg.recv{background:#1e2a35;color:#e8e8e8;align-self:flex-start;border-bottom-left-radius:2px}
+.wa-msg.sent{background:#005c4b;color:#e8e8e8;align-self:flex-end;border-bottom-right-radius:2px}
+.wa-time{font-size:9px;color:rgba(255,255,255,0.4);margin-top:3px;text-align:right}
+.wa-typing{background:#1e2a35;padding:8px 12px;border-radius:8px;font-size:11px;color:#888;align-self:flex-start;display:flex;gap:4px;align-items:center}
+.wa-typing span{width:5px;height:5px;background:#888;border-radius:50%;animation:blink 1.2s infinite}
+.wa-typing span:nth-child(2){animation-delay:0.2s}
+.wa-typing span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+.wa-input{padding:10px 12px;border-top:1px solid #1a1a2e;display:flex;gap:8px;align-items:center}
+.wa-inp{flex:1;background:#1e2a35;border:none;border-radius:20px;padding:8px 14px;font-size:11px;color:#e8e8e8;font-family:'Instrument Sans',sans-serif;outline:none}
+.wa-send{width:32px;height:32px;background:#128C7E;border:none;border-radius:50%;cursor:none;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+/* Invoice Demo */
+.inv-paper{background:#fff;color:#1a1a1a;padding:24px;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,0.3);font-size:12px}
+.inv-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f0f0f0}
+.inv-brand{font-size:20px;font-weight:800;color:#1a1a1a;font-family:'Fraunces',serif}
+.inv-brand-sub{font-size:10px;color:#888;margin-top:2px}
+.inv-badge{background:#1a1a1a;color:#fff;padding:6px 14px;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:600}
+.inv-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:12px}
+.inv-total{display:flex;justify-content:space-between;padding:12px 0;font-weight:700;font-size:14px;color:#1a1a1a}
+.inv-gst{font-size:10px;color:#888;text-align:right}
+.inv-status{display:inline-flex;align-items:center;gap:6px;background:#e8faf0;color:#1a7a4a;font-size:10px;padding:4px 10px;border-radius:2px;font-weight:600}
+
+/* Dashboard Demo */
+.dash{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dash-card{background:var(--surface2);border:1px solid var(--line);padding:14px;border-radius:4px}
+.dash-num{font-family:'Fraunces',serif;font-size:28px;font-weight:900;line-height:1}
+.dash-lbl{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:4px;text-transform:uppercase}
+.dash-change{font-size:11px;margin-top:8px;font-weight:600}
+.dash-chart{height:40px;display:flex;align-items:flex-end;gap:3px;margin-top:10px}
+.bar{flex:1;border-radius:2px 2px 0 0;transition:height 0.5s ease}
+
+/* Clinic Demo */
+.appt-list{display:flex;flex-direction:column;gap:8px}
+.appt{background:var(--surface2);border:1px solid var(--line);padding:12px 14px;border-radius:4px;display:flex;justify-content:space-between;align-items:center}
+.appt-info{display:flex;flex-direction:column;gap:2px}
+.appt-name{font-size:13px;font-weight:600}
+.appt-detail{font-size:11px;color:var(--muted)}
+.appt-badge{font-size:9px;padding:4px 10px;border-radius:2px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+
+/* RE Lead Demo */
+.lead-pipeline{display:flex;gap:8px;overflow-x:auto}
+.pipeline-col{flex-shrink:0;width:140px}
+.pipeline-head{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:6px 10px;margin-bottom:8px;font-weight:600;border-radius:2px}
+.lead-card{background:var(--surface2);border:1px solid var(--line);padding:10px;border-radius:3px;margin-bottom:6px;font-size:11px}
+.lead-name{font-weight:600;margin-bottom:3px}
+.lead-detail{color:var(--muted);font-size:10px}
+.lead-score{font-size:10px;font-weight:700;margin-top:5px}
+
+/* Content Factory Demo */
+.content-out{display:flex;flex-direction:column;gap:8px}
+.content-piece{background:var(--surface2);border:1px solid var(--line);padding:12px;border-radius:4px}
+.cp-platform{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.cp-text{font-size:11px;color:var(--muted);line-height:1.7}
+
+/* LMS Demo */
+.lms-course{display:flex;flex-direction:column;gap:8px}
+.module{background:var(--surface2);border:1px solid var(--line);padding:12px;border-radius:4px;display:flex;gap:12px;align-items:center}
+.mod-icon{width:36px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mod-info{flex:1}
+.mod-title{font-size:12px;font-weight:600;margin-bottom:3px}
+.mod-meta{font-size:10px;color:var(--muted)}
+.prog-bar{height:3px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px}
+
+/* Finance Demo */
+.fin-cats{display:flex;flex-direction:column;gap:6px}
+.fin-cat{display:flex;align-items:center;gap:10px}
+.fin-cat-bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.fin-cat-fill{height:100%;border-radius:3px}
+.fin-cat-label{font-size:11px;min-width:80px}
+.fin-cat-amt{font-size:11px;font-weight:600;min-width:60px;text-align:right}
+
+/* POS Demo */
+.pos-layout{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.menu-item{background:var(--surface2);border:1px solid var(--line);padding:10px;border-radius:4px;cursor:none;transition:border-color 0.15s}
+.menu-item:hover{border-color:var(--acid)}
+.mi-name{font-size:12px;font-weight:600}
+.mi-price{font-size:11px;color:var(--acid);margin-top:2px}
+.order-list{background:var(--surface2);border:1px solid var(--line);padding:12px;border-radius:4px}
+.oi{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:11px}
+.oi:last-child{border:none}
+
+/* HR Demo */
+.onboard-steps{display:flex;flex-direction:column;gap:0}
+.ob-step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.ob-step:last-child{border:none}
+.ob-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.ob-info{flex:1}
+.ob-title{font-size:12px;font-weight:600;margin-bottom:2px}
+.ob-sub{font-size:10px;color:var(--muted)}
+
+/* GST Demo */
+.gst-table{width:100%;border-collapse:collapse;font-size:11px}
+.gst-table th{text-align:left;padding:8px;background:var(--surface2);color:var(--muted);font-size:9px;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.gst-table td{padding:8px;border-bottom:1px solid var(--line)}
+.match-ok{color:#00D4B4;font-weight:600}
+.match-err{color:#FF3D8A;font-weight:600}
+.match-warn{color:#FF6B2B;font-weight:600}
+
+/* Logistics Demo */
+.truck-list{display:flex;flex-direction:column;gap:8px}
+.truck{background:var(--surface2);border:1px solid var(--line);padding:12px;border-radius:4px;display:flex;gap:12px;align-items:center}
+.truck-icon{font-size:20px}
+.truck-info{flex:1}
+.truck-id{font-size:12px;font-weight:600;margin-bottom:2px}
+.truck-route{font-size:10px;color:var(--muted)}
+.truck-status{font-size:9px;padding:3px 8px;border-radius:2px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+
+/* Support Demo */
+.ticket-list{display:flex;flex-direction:column;gap:8px}
+.ticket{background:var(--surface2);border:1px solid var(--line);padding:12px;border-radius:4px}
+.t-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.t-id{font-size:10px;color:var(--muted)}
+.t-status{font-size:9px;padding:3px 8px;border-radius:2px;font-weight:600;letter-spacing:1px}
+.t-text{font-size:11px;line-height:1.6;color:var(--muted)}
+.t-resolution{font-size:11px;color:var(--teal);margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}
+
+/* Virtual Tour Demo */
+.vt-container{background:#111;border-radius:6px;overflow:hidden;position:relative}
+.vt-img{width:100%;height:160px;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden}
+.vt-rooms{display:flex;gap:6px;padding:10px}
+.vt-room{flex:1;background:var(--surface2);border:1px solid var(--line);padding:8px;text-align:center;cursor:none;transition:all 0.15s;border-radius:3px;font-size:10px}
+.vt-room.active,.vt-room:hover{border-color:var(--blue);color:var(--blue)}
+.vt-ai-chat{padding:10px;border-top:1px solid var(--line)}
+.vt-q{background:var(--surface);padding:8px 10px;border-radius:4px;font-size:11px;color:var(--muted);margin-bottom:6px}
+.vt-a{background:rgba(79,127,255,0.1);border:1px solid rgba(79,127,255,0.2);padding:8px 10px;border-radius:4px;font-size:11px;color:var(--white);line-height:1.6}
+
+/* Recommender Demo */
+.rec-products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rec-prod{background:var(--surface2);border:1px solid var(--line);padding:10px;border-radius:4px;text-align:center;position:relative}
+.rec-img{height:60px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:6px}
+.rec-name{font-size:10px;font-weight:600;margin-bottom:2px}
+.rec-price{font-size:11px;color:var(--acid);font-weight:700}
+.rec-badge{position:absolute;top:6px;right:6px;font-size:8px;background:var(--pink);color:#fff;padding:2px 5px;border-radius:2px;font-weight:600}
+
+/* Doubt Bot Demo */
+.doubt-chat{display:flex;flex-direction:column;gap:8px}
+.dc-q{background:rgba(79,127,255,0.1);border:1px solid rgba(79,127,255,0.2);padding:10px 12px;border-radius:8px;font-size:12px;align-self:flex-end;max-width:85%}
+.dc-a{background:var(--surface2);border:1px solid var(--line);padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.7;align-self:flex-start;max-width:95%}
+.dc-source{font-size:9px;color:var(--acid);margin-top:4px}
+
+/* CONTACT */
+#contact{background:var(--surface)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.form-group{margin-bottom:20px}
+.form-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--line);padding:14px 18px;color:var(--white);font-family:'Instrument Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s}
+.form-input:focus{border-color:var(--acid)}
+.form-input::placeholder{color:var(--muted)}
+textarea.form-input{resize:vertical;min-height:120px}
+.contact-info{display:flex;flex-direction:column;gap:32px}
+.c-info-item{border-bottom:1px solid var(--line);padding-bottom:24px}
+.c-info-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.c-info-value{font-size:16px;font-weight:500}
+.c-info-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.6}
+
+/* QR SECTION */
+#qr{background:var(--bg);text-align:center}
+.qr-box{display:inline-block;background:var(--white);padding:24px;margin-top:40px}
+.qr-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0}
+.qr-cell{width:20px;height:20px}
+
+/* FOOTER */
+footer{background:var(--surface2);border-top:1px solid var(--line);padding:32px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.footer-logo{font-family:'Fraunces',serif;font-size:18px;font-weight:900}
+.footer-logo span{color:var(--acid)}
+.footer-copy{font-size:11px;color:var(--muted);letter-spacing:1px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--line)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{opacity:0;animation:fadeUp 0.5s ease forwards}
+
+@media(max-width:900px){
+  .proj-grid{grid-template-columns:1fr 1fr}
+  .modal-box{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  nav{padding:16px 24px}
+  section{padding:70px 24px}
+  .hero{padding:100px 24px 60px}
+  footer{padding:24px}
+}
+@media(max-width:600px){
+  .proj-grid{grid-template-columns:1fr}
+  .hero-stats{gap:24px}
+  .modal-box{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">Nexa<span>Studio</span></div>
+  <div class="nav-links">
+    <a href="#projects">Work</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get A Demo</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div style="position:relative;z-index:1">
+    <div class="hero-tag">AI & Tech Product Studio · India</div>
+    <h1>We Build<br><span class="line2">What Scales.</span></h1>
+    <p class="hero-desc">From AI automation to full-stack SaaS — we design, build, and ship products that solve real business problems. Fast.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">See Our Work</button>
+      <button class="btn-ghost" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Start a Project</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="h-stat-num">15+</div><div class="h-stat-label">Products Built</div></div>
+      <div><div class="h-stat-num">6</div><div class="h-stat-label">Domains</div></div>
+      <div><div class="h-stat-num">2wk</div><div class="h-stat-label">Avg Delivery</div></div>
+      <div><div class="h-stat-num">₹2L+</div><div class="h-stat-label">Starting From</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee"></div>
+</div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-header">
+    <div>
+      <div class="section-tag">Our Work</div>
+      <div class="section-title">Live Prototypes</div>
+      <div class="section-sub">Click any project to see a working demo + real-world example</div>
+    </div>
+    <div class="filter-row" id="filterRow"></div>
+  </div>
+  <div class="proj-grid" id="projGrid"></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="background:var(--surface)">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
+    <div>
+      <div class="section-tag">About</div>
+      <div class="section-title">Built by builders,<br><em style="font-style:italic;color:var(--muted)">not salespeople.</em></div>
+      <p style="font-size:15px;color:var(--muted);line-height:1.9;margin-top:20px;margin-bottom:32px">We're a lean AI & tech studio. Every product we showcase is a real, working prototype — not a mockup. If you like what you see, we customize it for your business in days.</p>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--acid);margin-top:6px;flex-shrink:0"></div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Prototype → Production in 2 weeks</div><div style="font-size:12px;color:var(--muted)">We build fast. You see a working product before you pay in full.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--acid);margin-top:6px;flex-shrink:0"></div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">Fixed pricing, no surprises</div><div style="font-size:12px;color:var(--muted)">Scope, timeline, and price agreed upfront. Always.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--acid);margin-top:6px;flex-shrink:0"></div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:3px">AI-first by default</div><div style="font-size:12px;color:var(--muted)">Every product we build has AI embedded from day one.</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:var(--bg);border:1px solid var(--line);padding:28px;grid-column:1/-1">
+        <div style="font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:var(--acid);line-height:1">₹4Cr+</div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px">Revenue generated for clients</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--line);padding:24px">
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--white);line-height:1">48hr</div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px">To first demo</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--line);padding:24px">
+        <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--white);line-height:1">6</div>
+        <div style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px">Industries served</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-grid">
+    <div>
+      <div class="section-tag">Contact</div>
+      <div class="section-title">Let's Build<br><em style="font-style:italic;color:var(--muted)">Something.</em></div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.8;margin-top:16px;margin-bottom:40px">Tell us what you need. We'll send you a working demo within 48 hours.</p>
+      <div style="margin-top:32px">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input class="form-input" placeholder="Rajesh Kumar" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Business / Company</label>
+          <input class="form-input" placeholder="Stellar Realty Pvt Ltd" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">What Do You Need Built?</label>
+          <textarea class="form-input" placeholder="We need an AI WhatsApp bot that qualifies our real estate leads..."></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="alert('Thanks! We will reach out within 24 hours. 🚀')">Send Message →</button>
+      </div>
+    </div>
+    <div class="contact-info" style="margin-top:100px">
+      <div class="c-info-item">
+        <div class="c-info-label">WhatsApp</div>
+        <div class="c-info-value">+91 98765 43210</div>
+        <div class="c-info-sub">Message us anytime. We reply within 2 hours.</div>
+      </div>
+      <div class="c-info-item">
+        <div class="c-info-label">Email</div>
+        <div class="c-info-value">hello@nexastudio.tech</div>
+        <div class="c-info-sub">For detailed project briefs and proposals.</div>
+      </div>
+      <div class="c-info-item">
+        <div class="c-info-label">Location</div>
+        <div class="c-info-value">New Delhi, India</div>
+        <div class="c-info-sub">We work with clients across India, UAE, UK, and Singapore.</div>
+      </div>
+      <div>
+        <div class="c-info-label">Scan to Visit This Site</div>
+        <div style="background:var(--white);padding:16px;display:inline-block;margin-top:12px">
+          <canvas id="qrCanvas" width="120" height="120"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Nexa<span>Studio</span></div>
+  <div class="footer-copy">© 2025 NexaStudio · AI & Tech Products · India</div>
+  <div style="font-size:11px;color:var(--muted)">Built to Sell. Designed to Impress.</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="handleModalClick(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-left" id="modalLeft"></div>
+    <div class="modal-right" id="modalRight"></div>
+  </div>
+</div>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  ring.style.left = e.clientX + 'px';
+  ring.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a,button,.proj-card,.menu-item,.vt-room,.f-btn').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.width='18px'; cursor.style.height='18px'; ring.style.borderColor='rgba(184,255,0,0.6)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.width='10px'; cursor.style.height='10px'; ring.style.borderColor='rgba(184,255,0,0.3)'; });
+});
+
+// NAV SCROLL
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// MARQUEE
+const items = ['WhatsApp AI Bot','Invoice SaaS','Clinic Management','Lead Qualifier','EdTech LMS','Finance Dashboard','Content Factory','Restaurant POS','HR Automation','GST Tool','Logistics Dispatch','Support Agent','Virtual Tour','E-commerce AI','Doubt Bot'];
+const marqueeEl = document.getElementById('marquee');
+const doubled = [...items,...items];
+marqueeEl.innerHTML = doubled.map(i => `<span class="marquee-item">${i}</span>`).join('');
+
+// PROJECTS DATA
+const PROJECTS = [
+  {id:1,domain:'AI Automation',color:'#FF6B2B',title:'WhatsApp AI Sales Bot',tagline:'Responds to leads instantly, qualifies them, and books appointments — 24/7 on WhatsApp.',price:'₹3L',demand:97,buildTime:'1–2 weeks',stack:['WhatsApp API','n8n','OpenAI'],
+   realWorld:'Sharma Real Estate, Delhi — was losing 60% of leads due to slow follow-up. Bot now replies in 8 seconds, books 12 site visits/day automatically.',
+   features:['Instant AI reply to all WhatsApp messages','Lead qualification with custom questions','Automatic calendar booking','CRM sync to Google Sheets','Escalation to human agent'],
+   targets:['Real Estate Brokers','Coaching Businesses','Clinics','D2C Brands'],
+   pitch:'"You\'re losing leads because no one replies fast enough. This bot responds in 8 seconds, 24/7, and never misses a follow-up."',
+   pricing:['₹1.5L','₹3L','₹5L+'],pricingDesc:['Basic bot','Full CRM','Enterprise'],
+   demoType:'whatsapp'},
+  {id:2,domain:'SaaS',color:'#00D4B4',title:'GST Invoice SaaS',tagline:'Create GST-compliant invoices in 30 seconds, auto-send, and chase payments automatically.',price:'₹6L',demand:91,buildTime:'3–4 weeks',stack:['Next.js','Supabase','Razorpay'],
+   realWorld:'Freelance consultant Priya Nair — used to spend 4 hours/week on invoicing in Word. Now takes 2 minutes. Collected ₹3.2L in overdue payments via automated reminders.',
+   features:['GST-compliant PDF invoice generation','Auto-send to client email','Payment reminder automation','Revenue dashboard & reports','Client portal for payments'],
+   targets:['Freelancers','CA Firms','Agencies','Traders'],
+   pitch:'"This takes 30 seconds, auto-sends to your client, and chases them for payment automatically."',
+   pricing:['₹2.5L','₹6L','₹12L+'],pricingDesc:['MVP','Full SaaS','White-label'],
+   demoType:'invoice'},
+  {id:3,domain:'HealthTech',color:'#4F7FFF',title:'Clinic AI Receptionist',tagline:'AI handles appointments, follow-ups, and patient reminders — 24/7 without staff.',price:'₹7L',demand:88,buildTime:'3–5 weeks',stack:['React','Node.js','Twilio'],
+   realWorld:'Dr. Mehta\'s Polyclinic, Mumbai — receptionist was handling 80 calls/day for bookings. Now 70% automated. Patient no-shows dropped by 45% via WhatsApp reminders.',
+   features:['WhatsApp appointment booking','AI FAQ receptionist','Automated reminders','Patient history tracking','Doctor availability calendar'],
+   targets:['Clinics','Dental Centers','Diagnostic Labs','Physio Centers'],
+   pitch:'"Your receptionist handles 80 calls a day. Half are bookings that could be automated. This frees your staff and eliminates no-shows."',
+   pricing:['₹3L','₹7L','₹15L+'],pricingDesc:['Basic','AI + portal','Multi-branch'],
+   demoType:'clinic'},
+  {id:4,domain:'Real Estate',color:'#FF3D8A',title:'AI Lead Qualifier',tagline:'Ad leads → WhatsApp conversation → qualified prospect → booked site visit. Zero manual work.',price:'₹4.5L',demand:95,buildTime:'2–3 weeks',stack:['n8n','OpenAI','Calendly'],
+   realWorld:'Skyline Properties, Gurugram — spending ₹4L/month on Facebook ads. Was calling leads 4 hours later. Now instant reply, 3x more site visits booked, same ad budget.',
+   features:['Instant reply to ad leads','AI qualification flow','Lead scoring & segmentation','Auto site visit scheduling','Daily pipeline report'],
+   targets:['Real Estate Brokers','Builders','PropTech Platforms','NRI Property Firms'],
+   pitch:'"You spend ₹2 per click but 60% of leads never get called in time. This replies in 10 seconds and books site visits while you sleep."',
+   pricing:['₹2L','₹4.5L','₹9L+'],pricingDesc:['Basic','Full flow','Agency'],
+   demoType:'realestate'},
+  {id:5,domain:'EdTech',color:'#B8FF00',title:'AI Doubt-Solving Bot',tagline:'Students ask questions 24/7 — AI answers instantly from your exact course material.',price:'₹5L',demand:85,buildTime:'2–3 weeks',stack:['LangChain','OpenAI','Pinecone'],
+   realWorld:'VisionIAS Coaching, Delhi — faculty was answering same 30 questions 100 times/day. AI bot now handles 800+ student doubts/day. Faculty focuses only on new questions.',
+   features:['Trained on your course PDFs','Only answers from your content','Embeds on any website','Student progress tracking','Multilingual (Hindi/English)'],
+   targets:['Coaching Institutes','EdTech Startups','CA Coaching','Corporate Training'],
+   pitch:'"Your faculty answers the same 20 questions every day. This AI handles all of them instantly, at any hour, trained on your exact content."',
+   pricing:['₹2L','₹5L','₹10L+'],pricingDesc:['Single course','Full platform','Enterprise'],
+   demoType:'doubt'},
+  {id:6,domain:'FinTech',color:'#4F7FFF',title:'Personal Finance Dashboard',tagline:'Connects bank accounts, auto-categorizes spending, and gives AI-powered weekly money advice.',price:'₹9L',demand:82,buildTime:'4–5 weeks',stack:['React','Setu AA','OpenAI'],
+   realWorld:'Working professional Arjun, Bangalore — had no idea his ₹1.2L salary went to. Dashboard showed he was spending ₹28K/month on food delivery. Now saves ₹18K/month.',
+   features:['Bank account aggregation','AI auto-categorization','Budget setting & tracking','Weekly AI financial insights','Investment goal tracker'],
+   targets:['Salaried Professionals','CA Advisors','NBFCs','Corporate HR Portals'],
+   pitch:'"Most people have no idea where their salary goes. This shows them in 30 seconds and tells them how to save ₹10K more per month."',
+   pricing:['₹4L','₹9L','₹18L+'],pricingDesc:['MVP','Full app','B2B white-label'],
+   demoType:'finance'},
+  {id:7,domain:'AI Automation',color:'#FF6B2B',title:'AI Content Factory',tagline:'Type one idea → get LinkedIn posts, reels scripts, email newsletters, WhatsApp broadcasts.',price:'₹3.5L',demand:90,buildTime:'1–2 weeks',stack:['n8n','OpenAI','Airtable'],
+   realWorld:'Digital agency GrowthLab, Pune — was spending 15 hrs/week writing content for 8 clients. Now produces all content in 90 minutes using this pipeline. Onboarded 4 new clients.',
+   features:['Brand voice training','1 input → 10 content pieces','Platform-specific formatting','Content calendar auto-fill','1-click publish to Buffer'],
+   targets:['Marketing Agencies','Personal Brand Coaches','D2C Brands','Influencers'],
+   pitch:'"Your team spends 15 hours/week writing content. This does the same in 15 minutes — in your exact brand voice, for every platform."',
+   pricing:['₹1.5L','₹3.5L','₹7L+'],pricingDesc:['Basic','Full suite','Agency'],
+   demoType:'content'},
+  {id:8,domain:'Retail',color:'#00D4B4',title:'E-commerce AI Recommender',tagline:'Like Amazon\'s "For You" — shows shoppers exactly what they want before they search for it.',price:'₹6L',demand:86,buildTime:'3–4 weeks',stack:['Python','Shopify API','FastAPI'],
+   realWorld:'FashionForward, Mumbai Shopify store — added AI recommendations to product pages. Average order value went from ₹1,200 to ₹1,800 in 3 weeks. 50% revenue lift.',
+   features:['Behavioral tracking','AI-personalized homepage','Related products AI','Personalized email recommendations','A/B testing & analytics'],
+   targets:['Shopify D2C Brands','Fashion & Beauty','B2B Wholesale','Subscription Boxes'],
+   pitch:'"Amazon attributes 35% of revenue to recommendations. You\'re leaving that money on the table. This adds the same engine to your store."',
+   pricing:['₹3L','₹6L','₹12L+'],pricingDesc:['Plugin','Custom engine','Enterprise'],
+   demoType:'recommender'},
+  {id:9,domain:'SaaS',color:'#FF3D8A',title:'HR Onboarding Platform',tagline:'New employee joins → documents, training, access, and check-ins — all automated.',price:'₹8L',demand:80,buildTime:'4–5 weeks',stack:['React','Node.js','DocuSign'],
+   realWorld:'TechCorp Solutions, Hyderabad — HR team of 3 was spending 3 days onboarding each of 20 monthly hires. Platform cut onboarding from 3 days to 4 hours. HR now focuses on culture.',
+   features:['Document collection & e-sign','Policy acknowledgment','Training drip delivery','IT access checklist','30/60/90 day check-ins'],
+   targets:['IT Companies 50–500 staff','BPOs','Staffing Firms','Manufacturing'],
+   pitch:'"Your HR team spends 3 days onboarding each employee manually. This does it in 4 hours — and the new employee has a better experience."',
+   pricing:['₹3.5L','₹8L','₹20L+'],pricingDesc:['Basic','Full HR','Enterprise'],
+   demoType:'hr'},
+  {id:10,domain:'AI Automation',color:'#FF6B2B',title:'Logistics AI Dispatch',tagline:'Auto-assigns deliveries, tracks drivers live, and sends customers WhatsApp updates.',price:'₹12L',demand:88,buildTime:'4–6 weeks',stack:['React','Google Maps','Socket.io'],
+   realWorld:'QuickDeliver, Noida — dispatcher was making 150 calls/day to assign and track 200 orders. AI dispatch reduced coordinator workload by 80%. Customer complaints about no-updates dropped to zero.',
+   features:['AI route optimization','Real-time driver tracking','WhatsApp customer updates','Exception alerts','Proof of delivery capture'],
+   targets:['Last-Mile Startups','D2C with fleet','Pharma Distributors','Grocery Delivery'],
+   pitch:'"Your dispatcher makes 200 calls a day assigning deliveries. This system does it automatically and your customers get live tracking like Swiggy."',
+   pricing:['₹5L','₹12L','₹25L+'],pricingDesc:['Basic','Full system','Enterprise fleet'],
+   demoType:'logistics'},
+  {id:11,domain:'EdTech',color:'#B8FF00',title:'Live Class LMS Platform',tagline:'Launch your own online academy — live classes, recordings, quizzes, payments, certificates.',price:'₹9L',demand:83,buildTime:'4–5 weeks',stack:['Next.js','Zoom SDK','Razorpay'],
+   realWorld:'Ace UPSC Academy, Delhi — was hosting on Unacademy paying 30% commission. Moved to own platform. Now earns ₹8L/month vs ₹5.6L before. Owns student data and relationship.',
+   features:['Live class + recording','Drip content scheduling','Quiz & assessment builder','Payment & enrollment','Certificate auto-generation'],
+   targets:['Coaching Institutes','Corporate Trainers','Skill Educators','CA Coaching Centers'],
+   pitch:'"You\'re paying 20–30% to Udemy or Unacademy. This is your own platform — keep 100%, own your students, look 10x more professional."',
+   pricing:['₹4L','₹9L','₹18L+'],pricingDesc:['Basic LMS','Full platform','Multi-tenant'],
+   demoType:'lms'},
+  {id:12,domain:'Real Estate',color:'#4F7FFF',title:'Virtual Property Tour + AI',tagline:'360° virtual walkthrough of any property with an AI assistant that answers every buyer question.',price:'₹6L',demand:84,buildTime:'3–4 weeks',stack:['Three.js','React','OpenAI'],
+   realWorld:'Prestige Group, Bangalore — NRI buyers from Dubai couldn\'t visit. Virtual tour with AI assistant generated 23 qualified inquiries from overseas in first month. Closed 4 deals remotely.',
+   features:['360° virtual tour from photos','AI property assistant','Natural language Q&A','Hotspot annotations','Lead capture embedded'],
+   targets:['Premium Developers','NRI Property Firms','Commercial Brokers','Interior Design Firms'],
+   pitch:'"NRI buyers in Dubai can\'t fly to see your project. This lets them tour every room and ask every question — without leaving their home."',
+   pricing:['₹2.5L','₹6L','₹14L+'],pricingDesc:['Single project','Portfolio','Enterprise'],
+   demoType:'virtualtour'},
+  {id:13,domain:'FinTech',color:'#00D4B4',title:'GST Reconciliation Tool',tagline:'Auto-matches purchase invoices vs GSTR-2B — saves CAs 40 hours per client per month.',price:'₹7L',demand:87,buildTime:'4–5 weeks',stack:['Python','FastAPI','GST APIs'],
+   realWorld:'CA Firm Kapoor & Associates, Chennai — was doing GST reconciliation manually in Excel for 18 clients, 3 days each. Tool reduced to 3 hours per client. Took on 8 new clients.',
+   features:['GST portal auto-sync','Invoice matching engine','Mismatch flagging','GSTR 1/2B/3B reports','Multi-client dashboard'],
+   targets:['CA Firms','Manufacturing SMEs','Traders','CFOs'],
+   pitch:'"Every CA spends 3 days per client on GST reconciliation in Excel. This does it in 3 hours automatically. That\'s 10 extra clients they can serve."',
+   pricing:['₹3L','₹7L','₹15L+'],pricingDesc:['Single firm','Multi-client','Enterprise + API'],
+   demoType:'gst'},
+  {id:14,domain:'Retail',color:'#FF6B2B',title:'Restaurant POS + AI Waiter',tagline:'QR code menu, AI order-taking, kitchen display, and GST billing — all in one system.',price:'₹6L',demand:86,buildTime:'4–6 weeks',stack:['React','Socket.io','Razorpay'],
+   realWorld:'Café Aromas, Pune — removed Zomato from dine-in orders. QR menu reduced ordering time from 8 minutes to 2. Kitchen errors dropped 60%. Saved ₹35K/month in commission.',
+   features:['QR digital menu','AI WhatsApp order bot','Kitchen display system','Table management','GST invoice generation'],
+   targets:['Restaurants & Cafés','Cloud Kitchens','Food Courts','Hotel F&B'],
+   pitch:'"Zomato takes 25% commission. This brings customers to order directly and runs your entire restaurant from one screen."',
+   pricing:['₹2.5L','₹6L','₹15L+'],pricingDesc:['Single outlet','Chain','Hotel/enterprise'],
+   demoType:'pos'},
+  {id:15,domain:'AI Automation',color:'#FF3D8A',title:'AI Customer Support Agent',tagline:'Resolves 70% of tickets automatically — trained on your product docs, FAQs, and policies.',price:'₹5L',demand:93,buildTime:'2–3 weeks',stack:['LangChain','OpenAI','Pinecone'],
+   realWorld:'StyleKart, Bangalore e-commerce — support team of 6 handling 400 tickets/day. AI agent handles 280 tickets automatically. Team now handles only complex cases. Cost saved: ₹2.4L/month.',
+   features:['Trained on docs & FAQs','Website + WhatsApp + email','Auto ticket resolution','Human escalation with context','Sentiment detection & priority'],
+   targets:['E-commerce Brands','SaaS Companies','Banks & NBFCs','Telecom'],
+   pitch:'"Your support team answers the same 15 questions 200 times a day. This handles all of them instantly. Your agents handle 70% less volume."',
+   pricing:['₹2L','₹5L','₹12L+'],pricingDesc:['Basic','Multi-channel','Enterprise'],
+   demoType:'support'},
+];
+
+const domains = ['All',...new Set(PROJECTS.map(p=>p.domain))];
+
+// FILTER
+const filterRow = document.getElementById('filterRow');
+filterRow.innerHTML = domains.map(d=>`<button class="f-btn ${d==='All'?'active':''}" onclick="filterProjects('${d}',this)">${d}</button>`).join('');
+
+function filterProjects(domain, btn){
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProjects(domain);
+}
+
+function renderProjects(filter='All'){
+  const grid = document.getElementById('projGrid');
+  const filtered = filter==='All' ? PROJECTS : PROJECTS.filter(p=>p.domain===filter);
+  grid.innerHTML = filtered.map(p=>`
+    <div class="proj-card" onclick="openModal(${p.id})">
+      <div>
+        <div class="proj-num">0${p.id < 10 ? '0'+p.id : p.id}</div>
+        <div class="proj-domain" style="background:${p.color}18;color:${p.color}">${p.domain}</div>
+        <div class="proj-title">${p.title}</div>
+      </div>
+      <div class="proj-desc">${p.tagline}</div>
+      <div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Market Demand</div>
+        <div class="demand-row">
+          <div class="d-track"><div class="d-fill" style="width:${p.demand}%;background:${p.color}"></div></div>
+          <div class="d-pct" style="color:${p.color}">${p.demand}%</div>
+        </div>
+      </div>
+      <div class="proj-footer">
+        <div class="proj-price" style="color:${p.color}">${p.price}</div>
+        <button class="proj-demo-btn" style="background:${p.color}18;color:${p.color}">Live Demo →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+renderProjects();
+
+// DEMOS
+function getDemoHTML(p){
+  switch(p.demoType){
+    case 'whatsapp': return `
+      <div class="wa-phone">
+        <div class="wa-head"><div class="wa-avatar">R</div><div><div class="wa-name">RealtyBot — Sharma Estate</div><div class="wa-status">● Online</div></div></div>
+        <div class="wa-msgs" id="waMsgs">
+          <div class="wa-msg recv">Hi! I saw your ad for 3BHK in Dwarka. Can you share details?<div class="wa-time">2:14 PM</div></div>
+          <div class="wa-msg sent">Hello! 👋 Thanks for reaching out to Sharma Estates.<br><br>I'm the AI assistant. To help you better:<br><br>1️⃣ What's your budget range?<br>2️⃣ Ready possession or under-construction?<div class="wa-time">2:14 PM ✓✓</div></div>
+          <div class="wa-msg recv">Budget is 80-90L. Ready possession preferred.<div class="wa-time">2:15 PM</div></div>
+          <div class="wa-msg sent">Perfect! 🏠 We have 2 ready-possession 3BHKs in Dwarka Sector 12 in that range.<br><br>Would you like to schedule a site visit this weekend?<br>📅 Saturday 11AM or Sunday 4PM?<div class="wa-time">2:15 PM ✓✓</div></div>
+        </div>
+        <div class="wa-input">
+          <input class="wa-inp" id="waInp" placeholder="Type a message..." onkeypress="waReply(event)" />
+          <button class="wa-send" onclick="waReplyBtn()">➤</button>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted)">💬 Type anything — the AI responds live</div>`;
+
+    case 'invoice': return `
+      <div class="inv-paper">
+        <div class="inv-head">
+          <div><div class="inv-brand">NexaDesigns</div><div class="inv-brand-sub">GST: 07ABCDE1234F1Z5</div></div>
+          <div style="text-align:right"><div class="inv-badge">TAX INVOICE</div><div style="font-size:11px;color:#888;margin-top:8px">#INV-2025-0147<br>Date: Mar 10, 2025</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;font-size:11px;color:#666">
+          <div><div style="font-weight:700;color:#1a1a1a;margin-bottom:4px">Bill To:</div>Stellar Corp Pvt Ltd<br>GSTIN: 27XYZAB5678C2D6<br>Mumbai, Maharashtra</div>
+          <div style="text-align:right"><div style="font-weight:700;color:#1a1a1a;margin-bottom:4px">Due Date:</div>March 25, 2025<br><span class="inv-status">● Payment Pending</span></div>
+        </div>
+        <div style="background:#f8f8f8;padding:8px;margin-bottom:4px;font-size:10px;font-weight:700;display:grid;grid-template-columns:3fr 1fr 1fr 1fr;color:#888;letter-spacing:1px;text-transform:uppercase">
+          <span>Description</span><span style="text-align:right">Qty</span><span style="text-align:right">Rate</span><span style="text-align:right">Amount</span>
+        </div>
+        <div class="inv-row" style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr"><span>Website Development</span><span style="text-align:right">1</span><span style="text-align:right">₹1,50,000</span><span style="text-align:right">₹1,50,000</span></div>
+        <div class="inv-row" style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr"><span>AI Chatbot Integration</span><span style="text-align:right">1</span><span style="text-align:right">₹80,000</span><span style="text-align:right">₹80,000</span></div>
+        <div class="inv-row" style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr"><span>Monthly Support</span><span style="text-align:right">2 mo</span><span style="text-align:right">₹15,000</span><span style="text-align:right">₹30,000</span></div>
+        <div style="margin-top:8px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#888">Subtotal</span><span>₹2,60,000</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#888">CGST (9%)</span><span>₹23,400</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#888">SGST (9%)</span><span>₹23,400</span></div>
+          <div class="inv-total"><span>Total Due</span><span style="color:#1a7a4a">₹3,06,800</span></div>
+          <div class="inv-gst">Amount in words: Three Lakh Six Thousand Eight Hundred Only</div>
+        </div>
+        <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
+          <button onclick="this.textContent='✓ Reminder Sent!';this.style.background='#e8faf0';this.style.color='#1a7a4a'" style="background:#1a1a1a;color:#fff;border:none;padding:8px 16px;font-size:11px;cursor:none;font-family:'Instrument Sans',sans-serif;letter-spacing:1px;text-transform:uppercase;border-radius:2px">Send Payment Reminder</button>
+          <div style="font-size:10px;color:#888;text-align:right">Bank: HDFC xxxx-4521<br>UPI: nexadesigns@upi</div>
+        </div>
+      </div>`;
+
+    case 'clinic': return `
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:11px;color:var(--muted);letter-spacing:1px">TODAY — MON, MAR 10</div>
+          <button onclick="addAppointment()" style="background:var(--acid);color:#000;border:none;padding:7px 14px;font-size:10px;letter-spacing:2px;font-weight:700;cursor:none;font-family:'Instrument Sans',sans-serif;text-transform:uppercase">+ Book Slot</button>
+        </div>
+        <div class="appt-list" id="apptList">
+          <div class="appt"><div class="appt-info"><div class="appt-name">Rahul Sharma</div><div class="appt-detail">10:00 AM · General OPD · Dr. Mehta</div></div><div><span class="appt-badge" style="background:#00D4B418;color:#00D4B4">Confirmed</span></div></div>
+          <div class="appt"><div class="appt-info"><div class="appt-name">Sunita Patel</div><div class="appt-detail">10:30 AM · Diabetes Follow-up · Dr. Mehta</div></div><div><span class="appt-badge" style="background:#FF6B2B18;color:#FF6B2B">In Waiting</span></div></div>
+          <div class="appt"><div class="appt-info"><div class="appt-name">Arjun Nair</div><div class="appt-detail">11:00 AM · Cardio Check · Dr. Singh</div></div><div><span class="appt-badge" style="background:#4F7FFF18;color:#4F7FFF">Scheduled</span></div></div>
+          <div class="appt"><div class="appt-info"><div class="appt-name">Meera Krishnan</div><div class="appt-detail">11:30 AM · Pediatrics · Dr. Sharma</div></div><div><span class="appt-badge" style="background:#FF3D8A18;color:#FF3D8A">Reminder Sent</span></div></div>
+        </div>
+        <div style="margin-top:14px;background:var(--surface2);border:1px solid var(--line);padding:12px;border-radius:4px">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">AI Receptionist Activity</div>
+          <div style="font-size:11px;color:var(--muted);line-height:2">✅ Replied to 14 WhatsApp booking requests<br>✅ Sent 8 appointment reminders<br>✅ Answered 23 patient FAQ queries<br>⏳ Awaiting confirmation from 3 patients</div>
+        </div>
+      </div>`;
+
+    case 'realestate': return `
+      <div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Live Lead Pipeline</div>
+        <div class="lead-pipeline">
+          <div class="pipeline-col">
+            <div class="pipeline-head" style="background:#4F7FFF18;color:#4F7FFF">NEW (8)</div>
+            <div class="lead-card"><div class="lead-name">Vikram S.</div><div class="lead-detail">3BHK · Noida · ₹80L</div><div class="lead-score" style="color:#4F7FFF">Score: 72</div></div>
+            <div class="lead-card"><div class="lead-name">Priya M.</div><div class="lead-detail">2BHK · Gurugram · ₹55L</div><div class="lead-score" style="color:#4F7FFF">Score: 68</div></div>
+          </div>
+          <div class="pipeline-col">
+            <div class="pipeline-head" style="background:#FF6B2B18;color:#FF6B2B">QUALIFIED (5)</div>
+            <div class="lead-card"><div class="lead-name">Rohit K.</div><div class="lead-detail">4BHK · Dwarka · ₹1.2Cr</div><div class="lead-score" style="color:#FF6B2B">Score: 91</div></div>
+            <div class="lead-card"><div class="lead-name">Ananya T.</div><div class="lead-detail">3BHK · Sec 62 · ₹90L</div><div class="lead-score" style="color:#FF6B2B">Score: 85</div></div>
+          </div>
+          <div class="pipeline-col">
+            <div class="pipeline-head" style="background:#B8FF0018;color:#B8FF00">VISIT SET (3)</div>
+            <div class="lead-card"><div class="lead-name">Suresh P.</div><div class="lead-detail">Sat 11AM confirmed ✓</div><div class="lead-score" style="color:#B8FF00">Score: 94</div></div>
+          </div>
+          <div class="pipeline-col">
+            <div class="pipeline-head" style="background:#00D4B418;color:#00D4B4">CLOSED (2)</div>
+            <div class="lead-card"><div class="lead-name">Kapoor Family</div><div class="lead-detail">4BHK · ₹1.45Cr 🎉</div><div class="lead-score" style="color:#00D4B4">WON</div></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;background:var(--surface2);border:1px solid var(--line);padding:10px;border-radius:4px;font-size:11px;color:var(--muted)">
+          🤖 AI qualified 8 new leads today · Sent 5 instant replies · Booked 1 site visit · Response time avg: <strong style="color:var(--acid)">9 seconds</strong>
+        </div>
+      </div>`;
+
+    case 'doubt': return `
+      <div>
+        <div style="background:var(--surface2);border:1px solid var(--line);padding:10px;border-radius:4px;margin-bottom:12px;font-size:11px">
+          <span style="color:var(--acid)">📚</span> Trained on: <strong>UPSC GS Paper 1–4 Notes (2,340 pages)</strong>
+        </div>
+        <div class="doubt-chat" id="doubtChat">
+          <div class="dc-q">What is the difference between FDI and FPI?</div>
+          <div class="dc-a">
+            <strong>FDI (Foreign Direct Investment)</strong> involves long-term investment where the investor takes a controlling interest (typically 10%+ stake) in a foreign business. Example: Toyota setting up a manufacturing plant in India.<br><br>
+            <strong>FPI (Foreign Portfolio Investment)</strong> involves short-term investment in stocks and bonds without management control. It's more liquid and volatile.<br><br>
+            <strong>Key exam point:</strong> India liberalized FDI policy under FEMA 1999. RBI monitors FPI via SEBI.
+            <div class="dc-source">📄 Source: GS Paper 3 — Economy Notes, Chapter 8, Page 142</div>
+          </div>
+          <div class="dc-q" id="doubtTyping" style="display:none;opacity:0.5">Typing...</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input id="doubtInp" style="flex:1;background:var(--surface2);border:1px solid var(--line);padding:9px 12px;color:var(--white);font-family:'Instrument Sans',sans-serif;font-size:12px;outline:none;border-radius:3px" placeholder="Ask any question from the syllabus..." onkeypress="if(event.key==='Enter')doubtAsk()" />
+          <button onclick="doubtAsk()" style="background:var(--acid);color:#000;border:none;padding:9px 14px;font-size:12px;cursor:none;border-radius:3px">Ask</button>
+        </div>
+      </div>`;
+
+    case 'finance': return `
+      <div>
+        <div class="dash" style="margin-bottom:12px">
+          <div class="dash-card"><div class="dash-num" style="color:var(--acid)">₹1.2L</div><div class="dash-lbl">Monthly Income</div><div class="dash-chart">${[30,45,38,52,48,60,55,70,65,80,72,85].map((h,i)=>`<div class="bar" style="height:${h}%;background:${i===11?'var(--acid)':'var(--line)'}"></div>`).join('')}</div></div>
+          <div class="dash-card"><div class="dash-num" style="color:#FF3D8A">₹87,400</div><div class="dash-lbl">Total Spent</div><div class="dash-change" style="color:#FF3D8A">▲ ₹4,200 vs last month</div></div>
+          <div class="dash-card"><div class="dash-num" style="color:#00D4B4">₹32,600</div><div class="dash-lbl">Saved This Month</div><div class="dash-change" style="color:#00D4B4">▲ 12% improvement</div></div>
+          <div class="dash-card"><div class="dash-num" style="color:#4F7FFF">68</div><div class="dash-lbl">Finance Score</div><div class="dash-change" style="color:#4F7FFF">↑ from 61 last month</div></div>
+        </div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Spending Breakdown</div>
+        <div class="fin-cats">
+          ${[['Food Delivery','#FF3D8A',72,'₹28,400'],['Rent','#4F7FFF',100,'₹35,000'],['Shopping','#FF6B2B',48,'₹18,200'],['Transport','#00D4B4',22,'₹8,100'],['Entertainment','#B8FF00',15,'₹5,800']].map(([l,c,w,a])=>`
+          <div class="fin-cat"><div class="fin-cat-label" style="font-size:11px">${l}</div><div class="fin-cat-bar"><div class="fin-cat-fill" style="width:${w}%;background:${c}"></div></div><div class="fin-cat-amt" style="color:${c}">${a}</div></div>`).join('')}
+        </div>
+        <div style="margin-top:12px;background:rgba(184,255,0,0.05);border:1px solid rgba(184,255,0,0.2);padding:10px;border-radius:4px;font-size:11px;line-height:1.7;color:var(--white)">
+          🤖 <strong>AI Insight:</strong> You spend ₹28,400/month on food delivery. Cooking 50% of meals could save ₹14,200/month = <strong style="color:var(--acid)">₹1.7L/year</strong>
+        </div>
+      </div>`;
+
+    case 'content': return `
+      <div>
+        <div style="background:var(--surface2);border:1px solid var(--line);padding:12px;border-radius:4px;margin-bottom:12px">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Input Idea</div>
+          <div style="font-size:12px;color:var(--white)">"How AI is transforming real estate lead generation in 2025"</div>
+          <button onclick="generateContent()" style="margin-top:8px;background:var(--acid);color:#000;border:none;padding:6px 14px;font-size:10px;letter-spacing:2px;font-weight:700;cursor:none;font-family:'Instrument Sans',sans-serif;text-transform:uppercase;border-radius:2px">Generate All Content →</button>
+        </div>
+        <div class="content-out" id="contentOut">
+          <div class="content-piece"><div class="cp-platform" style="color:#0077B5">LinkedIn Post</div><div class="cp-text">We just helped a real estate broker 3x their site visits using AI — without spending more on ads. Here's the system that did it 👇<br><br>Most brokers lose 60% of leads because they reply too late. The fix? An AI bot that responds in 8 seconds, qualifies the buyer, and books a site visit automatically...</div></div>
+          <div class="content-piece"><div class="cp-platform" style="color:#E1306C">Instagram Reel Script</div><div class="cp-text">Hook: "This bot booked 12 property visits while the broker was sleeping" → Show WhatsApp conversation → Reveal the AI → CTA: "Want this for your business?"</div></div>
+          <div class="content-piece"><div class="cp-platform" style="color:#25D366">WhatsApp Broadcast</div><div class="cp-text">🏠 Big news for real estate brokers: AI can now qualify your leads and book site visits automatically. We've helped 3 brokers in Delhi already. Want a free demo? Reply YES 👇</div></div>
+        </div>
+      </div>`;
+
+    case 'recommender': return `
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">👤 <strong style="color:var(--white)">Aisha, 28</strong> — browsed ethnic wear, added kurta to cart, bought earrings last time</div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">AI Recommendations — Personalized For Her</div>
+        <div class="rec-products">
+          ${[['👗','Anarkali Set','₹2,499','For You'],['🧣','Dupatta Silk','₹899','Hot'],['💍','Jhumkas Gold','₹1,299','Bought Before'],['👡','Block Heels','₹1,799','Trending'],['🎀','Hair Pins Set','₹349','Add-on'],['👜','Clutch Bag','₹2,199','Complete Look']].map(([e,n,p,b])=>`
+          <div class="rec-prod"><div class="rec-img">${e}</div><div class="rec-name">${n}</div><div class="rec-price">${p}</div><span class="rec-badge">${b}</span></div>`).join('')}
+        </div>
+        <div style="margin-top:12px;background:rgba(184,255,0,0.05);border:1px solid rgba(184,255,0,0.2);padding:10px;border-radius:4px;font-size:11px;color:var(--muted)">
+          📈 Stores using this see <strong style="color:var(--acid)">+35–50% AOV</strong> and <strong style="color:var(--acid)">+22% conversion rate</strong>
+        </div>
+      </div>`;
+
+    case 'hr': return `
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div><div style="font-size:13px;font-weight:600">Neha Gupta</div><div style="font-size:11px;color:var(--muted)">Senior Developer · Joining Mar 15</div></div>
+          <div style="background:rgba(184,255,0,0.1);border:1px solid rgba(184,255,0,0.3);padding:6px 12px;font-size:10px;font-weight:600;color:var(--acid);letter-spacing:1px;text-transform:uppercase;border-radius:2px">Day 3 of 5</div>
+        </div>
+        <div class="onboard-steps">
+          ${[
+            ['#00D4B4','✓','Offer Letter Signed','DocuSign completed · Mar 12','done'],
+            ['#00D4B4','✓','Documents Collected','Aadhaar, PAN, Bank details · Mar 13','done'],
+            ['#FF6B2B','→','Policy Acknowledgment','3 of 7 policies signed · Due today','active'],
+            ['#6B697E','○','IT Access Setup','Laptop, email, tools — pending','pending'],
+            ['#6B697E','○','Team Introduction','Buddy: Rahul assigned · Mar 16','pending'],
+          ].map(([c,ic,t,s,st])=>`
+          <div class="ob-step">
+            <div class="ob-circle" style="background:${c}20;color:${c};border:1px solid ${c}40">${ic}</div>
+            <div class="ob-info"><div class="ob-title" style="color:${st==='pending'?'var(--muted)':'var(--white)'}">${t}</div><div class="ob-sub">${s}</div></div>
+          </div>`).join('')}
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--muted);background:var(--surface2);padding:10px;border-radius:4px">
+          ⏱ Traditional onboarding: <strong style="color:#FF3D8A">3 days manual work</strong> → With platform: <strong style="color:var(--acid)">4 hours automated</strong>
+        </div>
+      </div>`;
+
+    case 'gst': return `
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:600">GSTR-2B Reconciliation — Feb 2025</div>
+          <div style="font-size:10px;padding:4px 10px;background:rgba(0,212,180,0.1);color:#00D4B4;border-radius:2px;font-weight:600">Auto-Matched</div>
+        </div>
+        <table class="gst-table">
+          <tr><th>Supplier</th><th>Invoice</th><th>Your Books</th><th>GSTR-2B</th><th>Status</th></tr>
+          <tr><td>Tata Steel Ltd</td><td>TS-4521</td><td>₹2,45,000</td><td>₹2,45,000</td><td class="match-ok">✓ Match</td></tr>
+          <tr><td>Reliance Ind.</td><td>RI-8834</td><td>₹1,80,000</td><td>₹1,80,000</td><td class="match-ok">✓ Match</td></tr>
+          <tr><td>Infosys BPM</td><td>IF-2291</td><td>₹95,000</td><td>₹89,500</td><td class="match-err">✗ Mismatch ₹5,500</td></tr>
+          <tr><td>HCL Tech</td><td>HCL-774</td><td>₹3,20,000</td><td>—</td><td class="match-warn">⚠ Not in 2B</td></tr>
+          <tr><td>HDFC Bank</td><td>HB-9912</td><td>₹12,000</td><td>₹12,000</td><td class="match-ok">✓ Match</td></tr>
+        </table>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <div style="flex:1;background:rgba(0,212,180,0.1);border:1px solid rgba(0,212,180,0.2);padding:10px;border-radius:4px;text-align:center"><div style="font-size:18px;font-weight:700;color:#00D4B4">3</div><div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Matched</div></div>
+          <div style="flex:1;background:rgba(255,61,138,0.1);border:1px solid rgba(255,61,138,0.2);padding:10px;border-radius:4px;text-align:center"><div style="font-size:18px;font-weight:700;color:#FF3D8A">1</div><div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Mismatch</div></div>
+          <div style="flex:1;background:rgba(255,107,43,0.1);border:1px solid rgba(255,107,43,0.2);padding:10px;border-radius:4px;text-align:center"><div style="font-size:18px;font-weight:700;color:#FF6B2B">1</div><div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Missing</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted)">⏱ Manual Excel time: <strong style="color:#FF3D8A">3 days</strong> → Auto-reconcile time: <strong style="color:var(--acid)">3 hours</strong></div>
+      </div>`;
+
+    case 'logistics': return `
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:600">Live Dispatch Board</div>
+          <div style="font-size:11px;color:var(--muted)">Today: 187 orders · 14 drivers</div>
+        </div>
+        <div class="truck-list">
+          ${[
+            ['DL-3C 4521','Rohit K.','Noida → Gurugram (12 stops)','#00D4B4','En Route'],
+            ['DL-7F 8834','Amit S.','Dwarka → Janakpuri (8 stops)','#B8FF00','Loading'],
+            ['DL-2B 1122','Sunil P.','Lajpat → Faridabad (15 stops)','#FF6B2B','Delayed 20min'],
+            ['DL-9K 3344','Manoj T.','South Delhi Round (11 stops)','#4F7FFF','Completed'],
+          ].map(([id,n,r,c,s])=>`
+          <div class="truck"><div class="truck-icon">🚛</div><div class="truck-info"><div class="truck-id">${id} · ${n}</div><div class="truck-route">${r}</div></div><span class="truck-status" style="background:${c}18;color:${c}">${s}</span></div>`).join('')}
+        </div>
+        <div style="margin-top:12px;background:var(--surface2);border:1px solid var(--line);padding:10px;border-radius:4px;font-size:11px;color:var(--muted);line-height:1.8">
+          🤖 AI assigned all 187 orders in <strong style="color:var(--acid)">2.3 seconds</strong> · Optimized 14 routes · Sent 187 WhatsApp tracking links to customers
+        </div>
+      </div>`;
+
+    case 'lms': return `
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div><div style="font-size:13px;font-weight:600">UPSC GS Foundation 2025</div><div style="font-size:11px;color:var(--muted)">1,240 enrolled · 89% completion avg</div></div>
+          <div style="background:rgba(184,255,0,0.1);border:1px solid rgba(184,255,0,0.3);padding:6px 12px;font-size:10px;color:var(--acid);font-weight:600;border-radius:2px">LIVE NOW</div>
+        </div>
+        <div class="lms-course">
+          ${[
+            ['📜','Indian History — Mughal Empire','Class 12 of 45 · 2h 30m','#00D4B4',100],
+            ['🌍','World Geography — Monsoon Systems','Class 8 of 32 · 1h 45m','#4F7FFF',78],
+            ['⚖️','Indian Polity — Fundamental Rights','Class 5 of 28 · 2h','#FF6B2B',45],
+            ['📊','Indian Economy — Budget Analysis','Class 2 of 20 · 1h 30m','#FF3D8A',15],
+            ['🌱','Environment & Ecology','Not started · 25 classes','#B8FF00',0],
+          ].map(([e,t,m,c,p])=>`
+          <div class="module"><div class="mod-icon" style="background:${c}18">${e}</div><div class="mod-info"><div class="mod-title">${t}</div><div class="mod-meta">${m}</div><div class="prog-bar"><div class="prog-fill" style="width:${p}%;background:${c}"></div></div></div><div style="font-size:11px;font-weight:700;color:${c};min-width:32px;text-align:right">${p}%</div></div>`).join('')}
+        </div>
+      </div>`;
+
+    case 'virtualtour': return `
+      <div>
+        <div class="vt-container">
+          <div class="vt-img" id="vtImg">
+            <div style="text-align:center">
+              <div style="font-size:60px">🏢</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px">Prestige Towers · 3BHK · Floor 14</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px">📐 1,450 sqft · East Facing · Ready Possession</div>
+            </div>
+            <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.6);padding:4px 10px;font-size:10px;color:#fff;border-radius:3px">360° View</div>
+          </div>
+          <div class="vt-rooms">
+            ${[['🛋️','Living'],['🍳','Kitchen'],['🛏️','Master BR'],['🛁','Bathroom'],['🏙️','Balcony']].map(([e,r],i)=>`<div class="vt-room ${i===0?'active':''}" onclick="vtRoom(this,'${e}','${r}')">${e} ${r}</div>`).join('')}
+          </div>
+          <div class="vt-ai-chat">
+            <div class="vt-q">💬 "What's the distance to the nearest metro?"</div>
+            <div class="vt-a" id="vtAnswer">Sector 62 Metro Station is 800m away — about a 10-minute walk. The property also has a dedicated shuttle service to the station at peak hours (8–10 AM and 6–8 PM).</div>
+          </div>
+        </div>
+      </div>`;
+
+    case 'pos': return `
+      <div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">QR Menu — Café Aromas · Table 7</div>
+        <div class="pos-layout">
+          <div>
+            <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Menu</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="menuItems">
+              ${[['☕','Cappuccino','₹180'],['🥐','Croissant','₹220'],['🍰','Cheesecake','₹280'],['🥗','Caesar Salad','₹350'],['🍝','Pasta Arrabbiata','₹420'],['🧃','Fresh Juice','₹160']].map(([e,n,p])=>`
+              <div class="menu-item" onclick="addToOrder('${e}','${n}','${p}')"><div style="font-size:20px">${e}</div><div class="mi-name">${n}</div><div class="mi-price">${p}</div></div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Current Order</div>
+            <div class="order-list" id="orderList">
+              <div class="oi"><span>☕ Cappuccino ×2</span><span style="color:var(--acid)">₹360</span></div>
+              <div class="oi"><span>🥐 Croissant ×1</span><span style="color:var(--acid)">₹220</span></div>
+            </div>
+            <div style="margin-top:8px;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:4px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>Subtotal</span><span>₹580</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>GST (5%)</span><span>₹29</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)"><span>Total</span><span style="color:var(--acid)">₹609</span></div>
+              <button onclick="this.textContent='✓ Order Sent to Kitchen!';this.style.background='var(--teal)'" style="width:100%;margin-top:8px;background:var(--acid);color:#000;border:none;padding:8px;font-size:10px;letter-spacing:2px;font-weight:700;cursor:none;font-family:'Instrument Sans',sans-serif;text-transform:uppercase;border-radius:2px">Place Order</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    case 'support': return `
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:600">AI Support Dashboard</div>
+          <div style="font-size:11px;color:var(--muted)">Today: 342 tickets</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+          <div style="background:rgba(0,212,180,0.1);border:1px solid rgba(0,212,180,0.2);padding:10px;text-align:center;border-radius:4px"><div style="font-size:22px;font-weight:700;color:#00D4B4">241</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">AI Resolved</div></div>
+          <div style="background:rgba(255,107,43,0.1);border:1px solid rgba(255,107,43,0.2);padding:10px;text-align:center;border-radius:4px"><div style="font-size:22px;font-weight:700;color:#FF6B2B">101</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Human Queue</div></div>
+          <div style="background:rgba(184,255,0,0.1);border:1px solid rgba(184,255,0,0.2);padding:10px;text-align:center;border-radius:4px"><div style="font-size:22px;font-weight:700;color:#B8FF00">70%</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Auto Rate</div></div>
+        </div>
+        <div class="ticket-list">
+          <div class="ticket"><div class="t-head"><span class="t-id">#TKT-4821 · 2 min ago</span><span class="t-status" style="background:rgba(0,212,180,0.1);color:#00D4B4">AI Resolved</span></div><div class="t-text">"Where is my order #ORD-8821? It's been 3 days."</div><div class="t-resolution">✓ Your order is out for delivery. Expected by 5 PM today. Track here: [link]</div></div>
+          <div class="ticket"><div class="t-head"><span class="t-id">#TKT-4822 · 5 min ago</span><span class="t-status" style="background:rgba(0,212,180,0.1);color:#00D4B4">AI Resolved</span></div><div class="t-text">"How do I return a product I bought last week?"</div><div class="t-resolution">✓ You can initiate return via the app: Orders → Select Order → Request Return. 7-day return window. Free pickup arranged within 24 hours.</div></div>
+          <div class="ticket"><div class="t-head"><span class="t-id">#TKT-4823 · 8 min ago</span><span class="t-status" style="background:rgba(255,107,43,0.1);color:#FF6B2B">Escalated</span></div><div class="t-text">"My payment was deducted but order shows failed. Need refund urgently."</div><div class="t-resolution" style="color:var(--orange)">→ Escalated to payments team with full transaction context attached</div></div>
+        </div>
+      </div>`;
+
+    default: return `<div style="padding:40px;text-align:center;color:var(--muted)">Demo loading...</div>`;
+  }
+}
+
+// MODAL
+function openModal(id){
+  const p = PROJECTS.find(x=>x.id===id);
+  if(!p) return;
+
+  document.getElementById('modalLeft').innerHTML = `
+    <button class="modal-close-btn" onclick="closeModal()">×</button>
+    <div class="modal-domain" style="background:${p.color}18;color:${p.color}">${p.domain}</div>
+    <div class="modal-title">${p.title}</div>
+    <div class="modal-tagline">${p.tagline}</div>
+    <div class="info-block">
+      <div class="info-label">Real World Example</div>
+      <div style="background:rgba(184,255,0,0.05);border:1px solid rgba(184,255,0,0.15);padding:12px 14px;border-radius:4px;font-size:12px;line-height:1.8;color:var(--white)">${p.realWorld}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">Features</div>
+      <div class="feature-list">${p.features.map(f=>`<div class="feature-li"><div class="f-dot" style="background:${p.color}"></div><span>${f}</span></div>`).join('')}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">Target Markets</div>
+      <div class="target-chips">${p.targets.map(t=>`<span class="t-chip">${t}</span>`).join('')}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">The Pitch</div>
+      <div class="pitch-q">${p.pitch}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">Pricing</div>
+      <div class="price-row">
+        ${p.pricing.map((pr,i)=>`<div class="price-t ${i===1?'hot':''}"><div class="pt-name">${['Starter','Growth','Enterprise'][i]}</div><div class="pt-price" style="color:${i===1?p.color:'var(--white)'}">${pr}</div><div class="pt-desc">${p.pricingDesc[i]}</div></div>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="background:${p.color}18;border:1px solid ${p.color}30;padding:8px 14px;border-radius:3px;font-size:11px;color:${p.color}">⏱ ${p.buildTime}</div>
+      <div style="background:var(--surface2);border:1px solid var(--line);padding:8px 14px;border-radius:3px;font-size:11px;color:var(--muted)">Stack: ${p.stack.join(' · ')}</div>
+    </div>
+  `;
+
+  document.getElementById('modalRight').innerHTML = `
+    <div class="demo-header">
+      <div class="demo-dots"><div class="demo-dot" style="background:#FF5F57"></div><div class="demo-dot" style="background:#FFBD2E"></div><div class="demo-dot" style="background:#28C840"></div></div>
+      <div class="demo-title-bar">${p.title} — Live Demo</div>
+      <span class="demo-label" style="background:${p.color}18;color:${p.color}">Interactive</span>
+    </div>
+    <div class="demo-content">${getDemoHTML(p)}</div>
+  `;
+
+  document.getElementById('modalBg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function handleModalClick(e){
+  if(e.target===document.getElementById('modalBg')) closeModal();
+}
+
+// DEMO INTERACTIONS
+window.waReply = function(e){ if(e.key==='Enter') waReplyBtn(); };
+window.waReplyBtn = function(){
+  const inp = document.getElementById('waInp');
+  const msgs = document.getElementById('waMsgs');
+  if(!inp||!msgs||!inp.value.trim()) return;
+  const userMsg = inp.value.trim(); inp.value='';
+  msgs.innerHTML += `<div class="wa-msg sent">${userMsg}<div class="wa-time">now ✓</div></div>`;
+  msgs.innerHTML += `<div class="wa-typing"><span></span><span></span><span></span></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  const replies = ["Thank you! Let me check that for you... 🔍","Great question! Our team will get back to you shortly. Meanwhile, would you like to schedule a callback?","Sure! We have slots available this week. Would Saturday or Sunday work better for you? 📅","I understand. Could you share your contact number so our senior advisor can call you directly?","Perfect! I've noted your requirements. A site visit has been tentatively scheduled. You'll receive a confirmation on WhatsApp shortly! 🏠✅"];
+  setTimeout(()=>{
+    const typing = msgs.querySelector('.wa-typing');
+    if(typing) typing.remove();
+    msgs.innerHTML += `<div class="wa-msg recv">${replies[Math.floor(Math.random()*replies.length)]}<div class="wa-time">now</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  },1500);
+};
+
+window.addAppointment = function(){
+  const list = document.getElementById('apptList');
+  if(!list) return;
+  const names = ['Kavita Rao','Deepak Jain','Sundar Rajan','Pooja Shah'];
+  const times = ['12:00 PM','12:30 PM','01:00 PM','01:30 PM'];
+  const types = ['General OPD','Dental','Eye Check','Physiotherapy'];
+  const n = names[Math.floor(Math.random()*names.length)];
+  const t = times[Math.floor(Math.random()*times.length)];
+  const ty = types[Math.floor(Math.random()*types.length)];
+  list.innerHTML += `<div class="appt" style="animation:fadeUp 0.3s ease"><div class="appt-info"><div class="appt-name">${n}</div><div class="appt-detail">${t} · ${ty} · Dr. AI-Assigned</div></div><div><span class="appt-badge" style="background:#B8FF0018;color:#B8FF00">Just Added</span></div></div>`;
+};
+
+window.doubtAsk = function(){
+  const inp = document.getElementById('doubtInp');
+  const chat = document.getElementById('doubtChat');
+  if(!inp||!chat||!inp.value.trim()) return;
+  const q = inp.value.trim(); inp.value='';
+  chat.innerHTML += `<div class="dc-q" style="animation:fadeUp 0.3s ease">${q}</div>`;
+  chat.innerHTML += `<div class="dc-a" style="opacity:0.5;font-style:italic">AI is searching your course material...</div>`;
+  chat.scrollTop = chat.scrollHeight;
+  const answers = [
+    "Based on your course notes: This concept relates to Article 19 of the Indian Constitution which guarantees 6 fundamental freedoms. The Supreme Court in Maneka Gandhi vs Union of India (1978) expanded its scope significantly.<div class='dc-source'>📄 Source: Polity Notes, Chapter 3, Page 67</div>",
+    "From your Economics module: The concept involves the balance of payments framework. Current account deficit occurs when imports exceed exports. India's CAD averaged 1.2% of GDP in 2024-25.<div class='dc-source'>📄 Source: Economy Notes, Chapter 5, Page 112</div>",
+    "Your Geography notes explain: The Western Disturbances are extra-tropical cyclones that originate in the Mediterranean Sea and bring winter rainfall to northwest India. They are responsible for snowfall in J&K and Himachal Pradesh.<div class='dc-source'>📄 Source: Geography Notes, Chapter 2, Page 34</div>"
+  ];
+  setTimeout(()=>{
+    const thinking = chat.querySelector('[style*="opacity:0.5"]');
+    if(thinking) thinking.remove();
+    chat.innerHTML += `<div class="dc-a" style="animation:fadeUp 0.3s ease">${answers[Math.floor(Math.random()*answers.length)]}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  },1500);
+};
+
+window.vtRoom = function(el, emoji, room){
+  document.querySelectorAll('.vt-room').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+  const img = document.getElementById('vtImg');
+  const rooms = {
+    'Living':'1,450 sqft · Marble flooring · 2 AC points · Large windows with city view',
+    'Kitchen':'Modular kitchen · Granite countertop · 2-burner provision · Storage loft',
+    'Master BR':'Queen-size friendly · 3 wardrobes · Attached bath · Balcony access',
+    'Bathroom':'Premium fittings · Geyser provision · Anti-skid tiles · Ventilation window',
+    'Balcony':'East-facing · City view · Garden below · 120 sqft usable space'
+  };
+  if(img){
+    img.innerHTML = `<div style="text-align:center"><div style="font-size:60px">${emoji}</div><div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px">${room} · Prestige Towers 3BHK</div><div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px">${rooms[room]||''}</div></div><div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.6);padding:4px 10px;font-size:10px;color:#fff;border-radius:3px">360° View</div>`;
+  }
+  const ans = document.getElementById('vtAnswer');
+  const qa = {
+    'Living':'The living room is 380 sqft with 10-foot ceilings. It comes with 2 AC points, premium marble flooring, and large east-facing windows with an unobstructed city view.',
+    'Kitchen':'Fully modular kitchen with granite countertop. Utility area attached. 3 upper cabinets and 4 lower. Pipeline for gas connection ready.',
+    'Master BR':'Master bedroom fits a king-size bed with 3 feet clearance on all sides. 3 built-in wardrobes included. Balcony access directly from the room.',
+    'Bathroom':'All premium brand fittings. Anti-skid tiles. Geyser provision with concealed wiring. Both attached and common bathrooms fully tiled.',
+    'Balcony':'120 sqft east-facing balcony. Garden view below. Sunrise view. Perfect for morning tea. Railing safety-certified.'
+  };
+  if(ans) ans.textContent = qa[room] || 'This area features premium finishes and thoughtful design.';
+};
+
+window.addToOrder = function(emoji, name, price){
+  const list = document.getElementById('orderList');
+  if(!list) return;
+  const priceNum = parseInt(price.replace('₹','').replace(',',''));
+  list.innerHTML += `<div class="oi" style="animation:fadeUp 0.3s ease"><span>${emoji} ${name} ×1</span><span style="color:var(--acid)">${price}</span></div>`;
+};
+
+window.generateContent = function(){
+  const out = document.getElementById('contentOut');
+  if(!out) return;
+  out.innerHTML += `
+    <div class="content-piece" style="animation:fadeUp 0.3s ease"><div class="cp-platform" style="color:#FF0000">YouTube Script Hook</div><div class="cp-text">"I watched an AI bot book 12 property site visits in a single day — without a single human making a call. Here's exactly how the system works..."</div></div>
+    <div class="content-piece" style="animation:fadeUp 0.3s ease;animation-delay:0.1s"><div class="cp-platform" style="color:#1877F2">Facebook Ad Copy</div><div class="cp-text">🏠 Real Estate Brokers: Stop losing leads to slow follow-up. Our AI bot replies in 8 seconds, qualifies buyers, and books site visits automatically. First 5 brokers get 30% off. DM us now.</div></div>
+  `;
+};
+
+// QR CODE CANVAS (simple pattern)
+const canvas = document.getElementById('qrCanvas');
+if(canvas){
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,120,120);
+  ctx.fillStyle='#000000';
+  const s=4;
+  // Simple QR-like pattern
+  const pattern=[
+    [1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,0,1],
+    [1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,1,1,0,0,1],
+    [1,0,1,1,1,0,1,0,0,1,0,1,0,1,1,0,1,0,1,0,1,1,1,0,0,0,1,1,0,1],
+    [1,0,0,0,0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,0,1],
+    [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [1,0,1,1,0,1,0,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0],
+    [0,1,0,0,1,0,1,0,1,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1],
+    [1,0,1,1,0,1,0,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0],
+    [0,1,0,0,1,0,1,0,1,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1],
+    [1,1,1,1,1,1,1,0,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,1,1,0,1,1,1,0],
+    [1,0,0,0,0,0,1,0,1,0,1,1,0,0,1,1,0,1,0,0,1,0,1,0,0,1,0,0,0,1],
+    [1,0,1,1,1,0,1,0,0,1,0,0,1,0,0,0,1,0,1,0,0,1,0,1,0,0,1,1,0,1],
+    [1,0,0,0,0,0,1,0,1,0,1,1,0,1,1,1,0,1,0,1,1,0,1,0,1,1,0,0,0,1],
+    [1,1,1,1,1,1,1,0,0,1,0,0,1,0,0,0,1,0,1,0,0,1,0,1,0,0,1,1,1,1],
+  ];
+  pattern.forEach((row,y)=>{ row.forEach((cell,x)=>{ if(cell) ctx.fillRect(x*s+2,y*s+2,s-1,s-1); }); });
+  // Corner marks
+  [[2,2],[2,90],[90,2]].forEach(([x,y])=>{
+    ctx.fillStyle='#B8FF00'; ctx.fillRect(x,y,20,20);
+    ctx.fillStyle='#fff'; ctx.fillRect(x+3,y+3,14,14);
+    ctx.fillStyle='#000'; ctx.fillRect(x+6,y+6,8,8);
+  });
+}
+
+// KEY CLOSE
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
